@@ -11,3 +11,67 @@ pom.xml.asc
 .lein-plugins/
 .lein-failures
 .nrepl-port
+target
+/.nrepl-port
+.DS_Store
+test/acceptance/selenese/result
+out
+.prv_env
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+/.nrepl-history
+
+# Org-mode
+.org-id-locations
+*_archive
+
+# flymake-mode
+*_flymake.*
+
+# eshell files
+/eshell/history
+/eshell/lastdir
+
+# elpa packages
+/elpa/
+
+# reftex files
+*.rel
+
+# AUCTeX auto folder
+/auto/
+
+# cask packages
+.cask/
+dist/
+
+# Flycheck
+flycheck_*.el
+
+# server auth directory
+/server/
+
+# projectiles files
+.projectile
+
+# directory configuration
+.dir-locals.el
+
+# lein
+.lein-failures
+.lein-env
+.lein-repl-history
+
+#figwheel
+figwheel_server.log
+
+/resources/public/js
+.nrepl-port
+.cljs_rhino_repl/
