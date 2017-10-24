@@ -7,7 +7,6 @@
                  [re-frame "0.10.1"]
                  [binaryage/devtools "0.9.4"]
                  [secretary "1.2.3"]
-
                  [io.pedestal/pedestal.service       "0.5.3"]
                  [io.pedestal/pedestal.service-tools "0.5.3"]
                  [io.pedestal/pedestal.jetty         "0.5.3"]
@@ -17,7 +16,11 @@
                  [org.clojure/java.jdbc "0.7.3"]
                  [org.postgresql/postgresql           "9.4.1212.jre7"]
                  [nilenso/honeysql-postgres           "0.2.2"]
-                 [hikari-cp "1.8.1"]]
+                 [hikari-cp "1.8.1"]
+                 [clj-jwt                             "0.1.1"]
+                 [com.cognitect/transit-clj "0.8.300"]
+                 [com.cognitect/transit-cljs          "0.8.239"]
+                 [matcho                              "0.1.0-RC6"]]
 
 
   :plugins [[lein-cljsbuild "1.1.5"]
