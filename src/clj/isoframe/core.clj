@@ -42,8 +42,9 @@
         http/create-server
         http/start)))
 
-(defn -main
-  []
+(defn start []
   (let [db (start-db)]
     (migration/migrate db)
     (start-server db)))
+
+(defn -main [] (start))

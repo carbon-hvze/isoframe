@@ -30,14 +30,15 @@
              :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                 cider.nrepl/cider-middleware]}
 
-  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  :repl-options {:init-ns isoframe.server
+                 :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
   :clean-targets ^{:protect false} ["resources/public/js" "target"]
 
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
-  :source-paths ["src/clj" "src/cljc"]
-  :main "isoframe.core"
+  :source-paths ["src/clj" "src/cljc" "env/clj"]
+  :main isoframe.core
 
   :cljsbuild {:builds {:client {:source-paths ["src/cljs" "src/cljc"]
                                 :compiler     {:asset-path           "js"
