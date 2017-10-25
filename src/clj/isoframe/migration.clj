@@ -4,6 +4,8 @@
 (defn migrate [db]
   (jdbc/execute! db
                  ["
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS
 user_resource (
   id text PRIMARY KEY,
@@ -21,9 +23,11 @@ session_resource (
 );
 
 CREATE TABLE IF NOT EXISTS
-registration_resource (
+todo_resource (
   id text PRIMARY KEY,
-  resource_type text default 'Registration',
+  resource_type text default 'Session',
   ts timestamptz DEFAULT current_timestamp,
   resource jsonb
-);"]))
+);
+
+"]))

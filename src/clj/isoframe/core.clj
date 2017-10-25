@@ -16,19 +16,21 @@
                                         :server-name "localhost"
                                         :username "postgres"
                                         :password "postgres"
-                                        :database-name (name db-name)})})
+                                        :database-name (name db-name)
+                                        :stringType "unspecified"})})
 
 (defn close-db [{ds :datasource}]
   (hikari/close-datasource ds))
 
 (defn insert-in-request
-  [value]
+  [key value]
   (ic/interceptor
    {:name ::insert-in-request
-    :enter (fn [context] (assoc-in context [:request ::component] value))}))
+    :enter (fn [ctx]
+             (assoc-in ctx [:request :component key] value))}))
 
 (defn start-server [db port]
-  (let [custom-interceptors [(insert-in-request db)
+  (let [custom-interceptors [(insert-in-request :db db)
                              (body-params/body-params)
                              (pedestal-middlewares/multipart-params)
                              http/transit-json-body]]
@@ -39,7 +41,7 @@
          ::http/join? false}
         http/default-interceptors
         http/dev-interceptors
-        (update [::http/interceptors] #(into % custom-interceptors))
+        (update ::http/interceptors #(vec (into % custom-interceptors)))
         http/create-server
         http/start)))
 

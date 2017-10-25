@@ -20,7 +20,9 @@
                  [clj-jwt                             "0.1.1"]
                  [com.cognitect/transit-clj "0.8.300"]
                  [com.cognitect/transit-cljs          "0.8.239"]
-                 [matcho                              "0.1.0-RC6"]]
+                 [matcho                              "0.1.0-RC6"]
+                 [org.mindrot/jbcrypt                 "0.3m"]
+                 [mpg                                 "1.3.0"]]
 
 
   :plugins [[lein-cljsbuild "1.1.5"]

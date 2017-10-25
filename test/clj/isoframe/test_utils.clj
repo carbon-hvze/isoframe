@@ -5,6 +5,7 @@
             [io.pedestal.test :as test]
             [cognitect.transit :as transit]
             [clj-jwt.core :as jwt]
+            [io.pedestal.http :as http]
 
             [isoframe.core :as core]
             [isoframe.db :as db])
