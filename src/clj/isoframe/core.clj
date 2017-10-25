@@ -12,7 +12,7 @@
 
 (defn start-db [db-name]
   {:datasource (hikari/make-datasource {:adapter "postgresql"
-                                        :port-number 6200
+                                        :port-number 6201
                                         :server-name "localhost"
                                         :username "postgres"
                                         :password "postgres"

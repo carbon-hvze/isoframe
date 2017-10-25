@@ -2,4 +2,4 @@ export PGPASSWORD=postgres
 echo 'drop database if exists isoframe;
       drop database if exists isoframe_test;
       create database isoframe;
-      create database isoframe_test' | psql -h localhost -p 6200 -U postgres
+      create database isoframe_test' | psql -h localhost -p 6201 -U postgres

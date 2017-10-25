@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:9.6.2
     ports:
-      - "6200:5432"
+      - "6201:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: isoframe
