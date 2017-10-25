@@ -13,6 +13,7 @@
                  [refactor-nrepl "2.3.1"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [com.cemerick/piggieback "0.2.2-SNAPSHOT"]
+                 [figwheel-sidecar "0.5.10"]
                  [org.clojure/java.jdbc "0.7.3"]
                  [org.postgresql/postgresql           "9.4.1212.jre7"]
                  [nilenso/honeysql-postgres           "0.2.2"]
@@ -38,20 +39,36 @@
   :repl-options {:init-ns isoframe.server
                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
-  :clean-targets ^{:protect false} ["resources/public/js" "target"]
+  :clean-targets ^{:protect false} ["resources/public/js" "target" "main.js"]
+
+  :aliases {"figwheel"        ["run" "-m" "user" "--figwheel"]
+                                        ; TODO: Remove custom extern inference as it's unreliable
+                                        ;"externs"         ["do" "clean"
+                                        ;                   ["run" "-m" "externs"]]
+            "rebuild-modules" ["run" "-m" "user" "--rebuild-modules"]
+            "prod-build"      ^{:doc "Recompile code with prod profile."}
+            ["with-profile" "prod" "cljsbuild" "once" "main"]}
 
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
   :source-paths ["src/clj" "src/cljc" "env/clj"]
   :main isoframe.core
 
-  :cljsbuild {:builds {:client {:source-paths ["src/cljs" "src/cljc"]
-                                :compiler     {:asset-path           "js"
-                                               :optimizations        :none
-                                               :source-map           true
-                                               :source-map-timestamp true
-                                               :main                 "isoframe.core"
-                                               :output-dir "resources/public/js"
-                                               :output-to  "resources/public/js/client.js"}
-                                :figwheel {:on-jsload "isoframe.core/main"}}}})
+  :cljsbuild {:builds [{:id "web"
+                        :source-paths ["src/web" "env/web" "src/cljc"]
+                        :compiler     {:asset-path           "js"
+                                       :optimizations        :none
+                                       :source-map           true
+                                       :source-map-timestamp true
+                                       :main                 "env.web.main"
+                                       :output-dir "resources/public/js"
+                                       :output-to  "resources/public/js/client.js"}
+                        :figwheel {:on-jsload "isoframe.core/main"}}
+                       {:id "mobile"
+                        :source-paths ["src/mobile" "env/mobile" "src/cljc"]
+                        :figwheel     true
+                        :compiler     {:output-to     "target/not-used.js"
+                                       :main          "env.mobile.main"
+                                       :output-dir    "target"
+                                       :optimizations :none}}]})
 
