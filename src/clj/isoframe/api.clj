@@ -1,8 +1,8 @@
 (ns isoframe.api
   (:require [clojure.tools.logging :as log]
-            [clj-jwt.core :as jwt]
 
-            [isoframe.db :as db])
+            [isoframe.db :as db]
+            [isoframe.jwt :as jwt])
   (:import org.mindrot.jbcrypt.BCrypt
            java.util.UUID))
 
@@ -15,6 +15,7 @@
   [{{:keys [db]} :component
     {:keys [resource-type]} :path-params
     :as ctx}]
+  (prn "here")
   {:status 200
    :body (db/all db resource-type)})
 
@@ -33,22 +34,6 @@
 (defn test-password [password hashed]
   (BCrypt/checkpw password hashed))
 
-(def secret-key "hello")
-
-(defn sign-jwt [val]
-  (-> val
-      jwt/jwt
-      (jwt/sign :HS256 secret-key)
-      jwt/to-str))
-
-(defn verify-jwt [token]
-  (try
-    (let [parsed (jwt/str->jwt token)]
-      (when (jwt/verify parsed :HS256 secret-key)
-        [true parsed]))
-    (catch Exception e
-      (log/warn e "Error while JWT parsing and verifying"))))
-
 (defmethod create
   :user
   [{{db :db} :component
@@ -56,7 +41,7 @@
   (let [user (update user :password make-password)
         user (db/create db :user user)
         session (db/create db :session {:email (:email user)})
-        jwt {:token (sign-jwt {:session-id (:id session)
+        jwt {:token (jwt/sign-jwt {:session-id (:id session)
                                :user-id (:id user)})}]
     {:status 201
      :body {:jwt jwt :user user}}))

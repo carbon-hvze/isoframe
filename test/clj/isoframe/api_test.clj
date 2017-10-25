@@ -16,19 +16,24 @@
 
   (matcho/match
    (u/http [:get "api" "todo"])
-   {:status 401
-    :body #"Unauthorized"})
+   {:status 403
+    :body {:message #"Authorized only"}})
+
+  (matcho/match
+   (u/http [:get "api" "todo"] {:jwt "wrong jwt"})
+   {:status 403
+    :body {:message #"Authorized only"}})
 
   (matcho/match
    (u/http [:post "api" "todo"]
            {:body {:name "My todo" :tasks []}})
-   {:status 401
-    :body #"Unauthorized"})
+   {:status 403
+    :body {:message #"Authorized only"}})
 
   (def new-user
     (u/http [:post "api" "user"] {:body {:first-name "Tim" :last-name "Zallin" :password "123"}}))
 
-  (def jwt (get-in new-user [:body :jwt]))
+  (def jwt (get-in new-user [:body :jwt :token]))
 
   (matcho/match
    new-user
@@ -36,9 +41,6 @@
     :body {:jwt not-empty :user not-empty}})
 
   (matcho/match
-   (u/http [:get "api" "todo"]
-           {:jwt jwt})
+   (u/http [:get "api" "todo"] {:jwt jwt})
    {:status 200
-    :body empty?})
-
-  )
+    :body empty?}))

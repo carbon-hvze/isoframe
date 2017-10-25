@@ -4,8 +4,9 @@
             [io.pedestal.interceptor :as ic]
             [mpg.core :as mpg]
 
-            [isoframe.api :as api])
-  )
+            [isoframe.api :as api]
+            [isoframe.jwt :as jwt]
+            [isoframe.db :as db]))
 
 (mpg/patch)
 
@@ -38,16 +39,32 @@
 
 (def keywordize-rt (ic/interceptor {:name ::keywordize-rt :enter *keywordize-rt}))
 
-(defn *auth-only [ctx]
-  (prn "BITCH ME LIKE")
-  (prn (keys (get-in ctx [:request :component])))
-  ctx)
+(defmulti forbidden?
+  #(get-in % [:request :path-params :resource-type]))
+
+(defmethod forbidden?
+  :default [_] true)
+
+(defmethod forbidden?
+  :user [_] false)
+
+(defn *auth-only [{{{db :db} :component
+                    headers :headers}
+                   :request
+                   :as ctx}]
+  (if-let [auth (get headers "authorization")]
+    (let [[valid? {{user-id :user-id} :claims}] (jwt/verify-jwt (subs auth 7))]
+      (if valid?
+        (assoc-in ctx [:request :user] (db/read db :user user-id))
+        (error 403 "Authorized only")))
+    (if (forbidden? ctx)
+      (error 403 "Authorized only")
+      ctx)))
 
 (def auth-only
-  (ic/interceptor {:name ::auth-only
-                   :enter *auth-only}))
+  (ic/interceptor {:name ::auth-only :enter *auth-only}))
 
-;; pedestal does not support multimethods as handlers by default
+;; pedestal does not support multimethods as interceptors by default
 
 (extend-protocol ic/IntoInterceptor
   clojure.lang.MultiFn

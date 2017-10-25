@@ -13,7 +13,6 @@
            java.io.ByteArrayOutputStream))
 
 (defonce system (atom nil))
-(defonce auth (atom nil))
 
 (defn truncate-db [db]
   (let [all-tables (->> {:select [:*]
@@ -38,31 +37,6 @@
   (stop-system)
   (reset! system (core/start {:db-name :isoframe_test :port 3001}))
   (clear-db))
-
-(defn user-id []
-  (assert @auth "Authorization should not be nil")
-  (:user-id @auth))
-
-(def secret-key "hello")
-
-(defn jwt [val]
-  (-> val
-      jwt/jwt
-      (jwt/sign :HS256 secret-key)
-      jwt/to-str))
-
-#_(defn auth! []
-  (let [db (:db @system)
-        usr (db/create db :user {:name "User"
-                                 :email "user@gmail.com"
-                                 :password "pass123"})
-        session (db/create db :session {:email (:email usr)})]
-    (reset! auth {:session-id (:id session)
-                  :user-id (:id usr)})))
-
-#_(defn start-system-with-auth []
-  (start-system)
-  (auth!))
 
 (defn read-transit [s]
   (let [in (ByteArrayInputStream. (.getBytes s "UTF-8"))]
@@ -92,7 +66,7 @@
         pedestal-fn (get-in @system [:web :io.pedestal.http/service-fn])
         res (test/response-for pedestal-fn verb url
                                :headers (cond-> {"Content-Type" "application/transit+json"}
-                                          @auth (assoc "Authorization" (str "Bearer " (jwt @auth))))
+                                          (:jwt opts) (assoc "Authorization" (str "Bearer " (:jwt opts))))
                                :body (->transit (:body opts)))
         read-transit (fn [res]
                        (let [tp (get-in res [:headers "Content-Type"])]
