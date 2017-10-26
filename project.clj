@@ -51,6 +51,9 @@
              :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl
                                 cider.nrepl/cider-middleware]}
 
+  :source-paths ["src/clj" "src/cljc" "env/clj"]
+  :main isoframe.core
+  :repl-options {:init-ns isoframe.server}
 
   :profiles {:web {:dependencies [[figwheel-sidecar "0.5.14"]]
 
@@ -62,11 +65,7 @@
                                                              :source-map-timestamp true
                                                              :main                 "isoframe.web-ui"
                                                              :output-dir "resources/public/js"
-                                                             :output-to  "resources/public/js/client.js"}}}}}
-
-             :server {:source-paths ["src/clj" "src/cljc" "env/clj"]
-                      :main isoframe.core
-                      :repl-options {:init-ns isoframe.server}}}
+                                                             :output-to  "resources/public/js/client.js"}}}}}}
 
   ;; :cljsbuild {:builds [{:id "mobile"
   ;;                       :source-paths ["src/mobile" "env/mobile" "src/cljc"]
@@ -74,7 +73,7 @@
   ;;                       :compiler     {:output-to     "target/not-used.js"
   ;;                                      :main          "env.mobile.main"
   ;;                                      :output-dir    "target"
-;;                                       :optimizations :none}}]}
+  ;;                                       :optimizations :none}}]}
 
 
   )

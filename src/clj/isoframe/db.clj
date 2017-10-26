@@ -83,3 +83,10 @@
         :returning [:*]}
        (query-first db)
        (record-to-resource)))
+
+(defn user-by-email [db email]
+  (->> {:select [:*]
+        :from [:user_resource]
+        :where [:= (hsql/raw "resource->>'email'") email]}
+       (query-first db)
+       record-to-resource))

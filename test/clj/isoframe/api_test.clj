@@ -43,10 +43,4 @@
   (matcho/match
    (u/http [:get "api" "todo"] {:jwt jwt})
    {:status 200
-    :body empty?})
-
-  (matcho/match
-   (u/http [:delete "api" "session"] {:jwt jwt})
-   )
-
-  )
+    :body empty?}))
