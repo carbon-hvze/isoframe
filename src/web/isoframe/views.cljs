@@ -34,29 +34,28 @@
           [:input.toggle
             {:type "checkbox"
              :checked done
-             :on-change #(dispatch [:toggle-done id])}]
+             :on-change #(rf/dispatch [:toggle-done id])}]
           [:label
             {:on-double-click #(reset! editing true)}
             title]
           [:button.destroy
-            {:on-click #(dispatch [:delete-todo id])}]]
+            {:on-click #(rf/dispatch [:delete-todo id])}]]
         (when @editing
           [todo-input
             {:class "edit"
              :title title
-             :on-save #(dispatch [:save id %])
+             :on-save #(rf/dispatch [:save id %])
              :on-stop #(reset! editing false)}])])))
 
 
-(defn task-list
-  []
-  (let [visible-todos @(subscribe [:visible-todos])
-        all-complete? @(subscribe [:all-complete?])]
+(defn task-list []
+  (let [visible-todos @(rf/subscribe [:visible-todos])
+        all-complete? @(rf/subscribe [:all-complete?])]
       [:section#main
         [:input#toggle-all
           {:type "checkbox"
            :checked all-complete?
-           :on-change #(dispatch [:complete-all-toggle])}]
+           :on-change #(rf/dispatch [:complete-all-toggle])}]
         [:label
           {:for "toggle-all"}
           "Mark all as complete"]
@@ -67,8 +66,8 @@
 
 (defn footer-controls
   []
-  (let [[active done] @(subscribe [:footer-counts])
-        showing       @(subscribe [:showing])
+  (let [[active done] @(rf/subscribe [:footer-counts])
+        showing       @(rf/subscribe [:showing])
         a-fn          (fn [filter-kw txt]
                         [:a {:class (when (= filter-kw showing) "selected")
                              :href (str "#/" (name filter-kw))} txt])]
@@ -80,7 +79,7 @@
       [:li (a-fn :active "Active")]
       [:li (a-fn :done   "Completed")]]
      (when (pos? done)
-       [:button#clear-completed {:on-click #(dispatch [:clear-completed])}
+       [:button#clear-completed {:on-click #(rf/dispatch [:clear-completed])}
         "Clear completed"])]))
 
 
@@ -91,7 +90,7 @@
     [todo-input
       {:id "new-todo"
        :placeholder "What needs to be done?"
-       :on-save #(dispatch [:add-todo %])}]])
+       :on-save #(rf/dispatch [:add-todo %])}]])
 
 
 (defn todo-app
@@ -99,7 +98,7 @@
   [:div
    [:section#todoapp
     [task-entry]
-    (when (seq @(subscribe [:todos]))
+    (when (seq @(rf/subscribe [:todos]))
       [task-list])
     [footer-controls]]
    [:footer#info

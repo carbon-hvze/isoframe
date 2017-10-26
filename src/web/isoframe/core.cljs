@@ -2,14 +2,26 @@
   (:require [goog.events :as events]
             [reagent.core :as reagent]
             [re-frame.core :as rf]
+            [secretary.core :as secretary :refer-macros [defroute]]
 
             [isoframe.events]
             [isoframe.subs]
-            [isoframe.views]))
+            [isoframe.views :as views])
+  (:import [goog History]
+           [goog.history EventType]))
 
-(defn ^:export main
+(defroute "/" [] (rf/dispatch [:set-showing :all]))
+(defroute "/:filter" [filter] (rf/dispatch [:set-showing (keyword filter)]))
+
+(def history
+  (doto (History.)
+    (events/listen EventType.NAVIGATE
+                   (fn [event] (secretary/dispatch! (.-token event))))
+    (.setEnabled true)))
+
+(defn init!
   []
-  (dispatch-sync [:initialise-db])
-  (reagent/render [todomvc.views/todo-app]
+  (rf/dispatch-sync [:initialise-db])
+  (reagent/render [views/todo-app]
                   (.getElementById js/document "app")))
 

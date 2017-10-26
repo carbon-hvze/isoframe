@@ -8,9 +8,13 @@
   (when-not (s/valid? a-spec db)
     (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
 
-(def todo-interceptors [(rf/after #(check-and-throw :isoframe.db/db %))
+(def check-spec-interceptor
+  (rf/after (partial check-and-throw ::db/db)))
+
+(def todo-interceptors [check-spec-interceptor
                         (rf/path :todos)
-                        (rf/after db/todos->local-store)])
+                        (rf/after db/todos->local-store)
+                        rf/trim-v])
 
 (defn allocate-next-id [todos]
   ((fnil inc 0) (last (keys todos))))
@@ -31,7 +35,7 @@
 (rf/reg-event-db
   :add-todo
   todo-interceptors
-  (fn [todos [_ text]]
+  (fn [todos [text]]
     (let [id (allocate-next-id todos)]
       (assoc todos id {:id id :title text :done false}))))
 

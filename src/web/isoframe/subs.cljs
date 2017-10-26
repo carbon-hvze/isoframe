@@ -30,3 +30,22 @@
                       :done   :done
                       :all    identity)]
       (filter filter-fn todos))))
+
+(rf/reg-sub
+ :all-complete?
+ :<- [:todos]
+ (fn [todos _]
+   (every? :done todos)))
+
+(rf/reg-sub
+ :completed-count
+ :<- [:todos]
+ (fn [todos _]
+   (count (filter :done todos))))
+
+(rf/reg-sub
+ :footer-counts
+ :<- [:todos]
+ :<- [:completed-count]
+ (fn [[todos completed] _]
+   [(- (count todos) completed) completed]))
