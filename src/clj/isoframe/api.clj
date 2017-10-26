@@ -15,7 +15,6 @@
   [{{:keys [db]} :component
     {:keys [resource-type]} :path-params
     :as ctx}]
-  (prn "here")
   {:status 200
    :body (db/all db resource-type)})
 
@@ -28,6 +27,16 @@
   {:status 201
    :body (db/create db (ctx-to-resource-type ctx) res)})
 
+(defmethod create
+  :session
+  [{{db :db} :component
+    requ :transit-params :as ctx}]
+  (let [session (db/create db (ctx-to-resource-type ctx) (dissoc requ :password))
+        user (db/user-by-email db (:email requ))]
+    {:status 201
+     :body (merge session
+                  {:token (jwt/sign-jwt {:session-id (:id session)
+                                         :user-id (:id user)})})}))
 (defn make-password [password]
   (BCrypt/hashpw password (BCrypt/gensalt)))
 
