@@ -23,7 +23,8 @@
                  [com.cognitect/transit-cljs          "0.8.239"]
                  [matcho                              "0.1.0-RC6"]
                  [org.mindrot/jbcrypt                 "0.3m"]
-                 [mpg                                 "1.3.0"]]
+                 [mpg                                 "1.3.0"]
+                 [re-frisk "0.5.0"]]
 
 
   :plugins [[lein-cljsbuild "1.1.5"]
@@ -60,10 +61,9 @@
                                        :optimizations        :none
                                        :source-map           true
                                        :source-map-timestamp true
-                                       :main                 "env.web.main"
+                                       :main                 "isoframe.dev"
                                        :output-dir "resources/public/js"
-                                       :output-to  "resources/public/js/client.js"}
-                        :figwheel {:on-jsload "isoframe.core/main"}}
+                                       :output-to  "resources/public/js/client.js"}}
                        {:id "mobile"
                         :source-paths ["src/mobile" "env/mobile" "src/cljc"]
                         :figwheel     true
@@ -71,4 +71,3 @@
                                        :main          "env.mobile.main"
                                        :output-dir    "target"
                                        :optimizations :none}}]})
-
