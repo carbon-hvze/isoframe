@@ -41,15 +41,24 @@
 
   (def new-task {:todo-id todo-id :value "Prepare 4 ITGM"})
 
+  (def new-task-id (get-in new-task [:body :id]))
+
   (rf/dispatch [:add-task new-task])
 
   (Thread/sleep 500)
 
+  (def tasks (u/http [:get "api" "task" {:todo-id todo-id}]))
+
   (matcho/match
-   (u/http [:get "api" "task" {:todo-id todo-id}])
+   tasks
    {:status 200
     :body [new-task]})
 
+  (def task-id (->> tasks :body first :id))
+
   (matcho/match
    @(rf/subscribe [:tasks todo-id])
-   [new-task]))
+   {task-id new-task})
+
+
+  )

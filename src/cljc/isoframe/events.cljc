@@ -17,12 +17,6 @@
                         (rf/path :todos)
                         rf/trim-v])
 
-(rf/reg-event-db
- :save-todos
- [rf/trim-v]
- (fn [db [todos]]
-   (reduce #(assoc-in %1 [:todos (:id %2)] %2) db todos)))
-
 (rf/reg-event-fx
  :initialise-db
  [#_check-spec-interceptor]
@@ -34,16 +28,30 @@
           :handler #(rf/dispatch [:save-todos %])}}))
 
 (rf/reg-event-db
+ :save-todos
+ [rf/trim-v]
+ (fn [db [todos]]
+   (reduce #(assoc-in %1 [:todos (:id %2)] %2) db todos)))
+
+(rf/reg-event-db
  :save-task
  [rf/trim-v]
  (fn [db [task]]
-   (update-in db [:todos (:todo-id task) :tasks] conj task)))
+   (assoc-in db [:todos (:todo-id task) :tasks (:id task)] task)))
 
 (rf/reg-event-fx
  :add-task
  (fn [db [_ task]]
    {:xhr {:method :post
           :uri "/api/task"
+          :body task
+          :handler #(rf/dispatch [:save-task %])}}))
+
+(rf/reg-event-fx
+ :update-task
+ (fn [db [_ task]]
+   {:xhr {:method :put
+          :uri (str "/api/task" (:id task))
           :body task
           :handler #(rf/dispatch [:save-task %])}}))
 

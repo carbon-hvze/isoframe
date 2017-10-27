@@ -15,18 +15,3 @@
   #{:all :active :done})
 
 (s/def ::db (s/keys :req-un [::todos ::showing]))
-
-(def ls-key "todos-isoframe")
-
-(defn todos->local-store
-  "Puts todos into localStorage"
-  [todos]
-  (.setItem js/localStorage ls-key (str todos)))
-
-(re-frame/reg-cofx
-  :local-store-todos
-  (fn [cofx _]
-      (assoc cofx :local-store-todos
-             (into (sorted-map)
-                   (some->> (.getItem js/localStorage ls-key)
-                            (reader/read-string))))))
