@@ -64,6 +64,15 @@
 (def auth-only
   (ic/interceptor {:name ::auth-only :enter *auth-only}))
 
+(defn *tx [{{{db :db} :component
+             user :user} :request
+            :as ctx}]
+  (let [res {:user user}
+        tx (db/create-transaction db res)]
+    (assoc-in ctx [:request :tx] tx)))
+
+(def tx (ic/interceptor {:name ::tx :enter *tx}))
+
 ;; pedestal does not support multimethods as interceptors by default
 
 (extend-protocol ic/IntoInterceptor
@@ -74,10 +83,10 @@
 
 (def routes
   `[[["/" {:get index}
-      ^:interceptors [http-error keywordize-rt auth-only]
+      ^:interceptors [http-error keywordize-rt #_auth-only]
       ["/api/:resource-type" {:get api/search
-                              :post api/create}
+                              :post [:create ^:interceptors [tx] api/create]}
        ["/:id" {:get api/*read
-                :put api/*update
-                :delete api/delete
-                :patch api/patch}]]]]])
+                :put [:update ^:interceptors [tx] api/*update]
+                :delete [:delete ^:interceptors [tx] api/delete]
+                :patch [:patch ^:interceptors [tx] api/patch]}]]]]])

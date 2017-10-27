@@ -47,7 +47,6 @@
              :on-save #(rf/dispatch [:save id %])
              :on-stop #(reset! editing false)}])])))
 
-
 (defn task-list []
   (let [visible-todos @(rf/subscribe [:visible-todos])
         all-complete? @(rf/subscribe [:all-complete?])]
@@ -62,7 +61,6 @@
         [:ul#todo-list
           (for [todo  visible-todos]
             ^{:key (:id todo)} [todo-item todo])]]))
-
 
 (defn footer-controls
   []

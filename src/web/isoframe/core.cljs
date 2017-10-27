@@ -4,6 +4,8 @@
             [re-frame.core :as rf]
             [secretary.core :as secretary :refer-macros [defroute]]
 
+            [isoframe.xhr]
+            [isoframe.cookies]
             [isoframe.events]
             [isoframe.subs]
             [isoframe.views :as views])

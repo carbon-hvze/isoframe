@@ -18,6 +18,17 @@
   {:status 200
    :body (db/all db resource-type)})
 
+(defmethod search :task
+  [{{:keys [db]} :component
+    {:keys [resource-type]} :path-params
+    {:keys [todo-id]} :query-params
+    :as ctx}]
+  (if todo-id
+    {:status 200
+     :body (db/tasks-by-todo-id db todo-id)}
+    {:status 400
+     :body "Query param not provided"}))
+
 (defmulti create ctx-to-resource-type)
 
 (defmethod create

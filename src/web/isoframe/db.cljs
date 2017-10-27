@@ -16,10 +16,6 @@
 
 (s/def ::db (s/keys :req-un [::todos ::showing]))
 
-(def default-db
-  {:todos   (sorted-map)
-   :showing :all})
-
 (def ls-key "todos-isoframe")
 
 (defn todos->local-store

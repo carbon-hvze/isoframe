@@ -23,6 +23,8 @@
                  [binaryage/devtools "0.9.4"]
                  [re-frisk "0.5.0"]
 
+                 [cljs-ajax "0.7.2" :exclusions [com.cognitect/transit-clj]]
+                 [reagent "0.7.0"]
                  [re-frame "0.10.1"]
                  [secretary "1.2.3"]
                  [com.cognitect/transit-cljs          "0.8.239"]]

@@ -54,10 +54,11 @@
        (query db)
        (map record-to-resource)))
 
-(defn create [db rt resource]
+(defn create [db rt resource & [tx]]
   (->> {:insert-into (to-table-name rt)
         :values [{:id (hsql/raw "gen_random_uuid()::text")
-                  :resource (json/generate-string resource)}]
+                  :resource (json/generate-string resource)
+                  :txid (or (:id tx) -1)}]
         :returning [:*]}
        (query-first db)
        (record-to-resource)))
@@ -69,9 +70,10 @@
        (query-first db)
        (record-to-resource)))
 
-(defn update [db rt id resource]
+(defn update [db rt id resource & [tx]]
   (->> {:update (to-table-name rt)
-        :set {:resource (json/generate-string resource)}
+        :set {:resource (json/generate-string resource)
+              :txid (or (:id tx) -1)}
         :where [:= :id id]
         :returning [:*]}
        (query-first db)
@@ -90,3 +92,17 @@
         :where [:= (hsql/raw "resource->>'email'") email]}
        (query-first db)
        record-to-resource))
+
+(defn create-transaction [db desc]
+  (->> {:insert-into :transaction_resource
+        :values [{:resource (json/generate-string desc)}]
+        :returning [:*]}
+       (query-first db)
+       (record-to-resource)))
+
+(defn tasks-by-todo-id [db todo-id]
+  (->> {:select [:*]
+        :from [:task_resource]
+        :where [:= (hsql/raw "resource->>'todo-id'") todo-id]}
+       (query db)
+       (map record-to-resource)))
