@@ -39,26 +39,29 @@
    @(rf/subscribe [:todos])
    {todo-id {:name "My todo"}})
 
-  (def new-task {:todo-id todo-id :value "Prepare 4 ITGM"})
-
-  (def new-task-id (get-in new-task [:body :id]))
-
-  (rf/dispatch [:add-task new-task])
+  (rf/dispatch [:add-task {:todo-id todo-id :value "Prepare 4 ITGM" :status "active"}])
 
   (Thread/sleep 500)
 
-  (def tasks (u/http [:get "api" "task" {:todo-id todo-id}]))
+  (def task (->> (u/http [:get "api" "task" {:todo-id todo-id}]) :body first))
 
-  (matcho/match
-   tasks
-   {:status 200
-    :body [new-task]})
-
-  (def task-id (->> tasks :body first :id))
+  (def task-id (:id task))
 
   (matcho/match
    @(rf/subscribe [:tasks todo-id])
-   {task-id new-task})
+   {task-id task})
 
+  (rf/dispatch [:update-task (assoc task :status "done")])
+
+  (Thread/sleep 500)
+
+  (matcho/match
+   (u/http [:get "api" "task" task-id])
+   {:status 200
+    :body {:status "done"}})
+
+  (matcho/match
+   @(rf/subscribe [:tasks todo-id])
+   {task-id {:status "done"}})
 
   )

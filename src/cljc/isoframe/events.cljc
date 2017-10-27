@@ -51,7 +51,7 @@
  :update-task
  (fn [db [_ task]]
    {:xhr {:method :put
-          :uri (str "/api/task" (:id task))
+          :uri (str "/api/task/" (:id task))
           :body task
           :handler #(rf/dispatch [:save-task %])}}))
 

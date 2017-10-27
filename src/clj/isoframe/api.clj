@@ -18,6 +18,13 @@
   {:status 200
    :body (db/all db resource-type)})
 
+(defmethod search :todo
+  [{{:keys [db]} :component
+    {:keys [resource-type]} :path-params
+    :as ctx}]
+  {:status 200
+   :body (db/todo-bundle db)})
+
 (defmethod search :task
   [{{:keys [db]} :component
     {:keys [resource-type]} :path-params

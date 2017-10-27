@@ -35,7 +35,7 @@
     :body empty?})
 
   (def new-task
-    (u/http [:post "api" "task"] {:body {:todo-id new-todo-id :value "Pepper 4 ITGM"}}))
+    (u/http [:post "api" "task"] {:body {:todo-id new-todo-id :value "Pepper 4 ITGM" :status "active"}}))
 
   (def new-task-id (get-in new-task [:body :id]))
 
@@ -44,6 +44,13 @@
   (matcho/match
    (u/http [:get "api" "task" {:todo-id new-todo-id}])
    {:status 200
-    :body [(:body new-task)]}))
+    :body [(:body new-task)]})
+
+  (matcho/match
+   (u/http [:get "api" "todo"])
+   {:status 200
+    :body [{:id new-todo-id :tasks {new-task-id (:body new-task)}}]})
+
+  )
 
 

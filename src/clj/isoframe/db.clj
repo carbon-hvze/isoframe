@@ -106,3 +106,14 @@
         :where [:= (hsql/raw "resource->>'todo-id'") todo-id]}
        (query db)
        (map record-to-resource)))
+
+(defn todo-bundle [db]
+  (let [todos (all db :todo)
+        tasks (all db :task)]
+    (map (fn [{:keys [id] :as todo}]
+           (let [task-idx (->> tasks
+                               (filter #(= id (:todo-id %)))
+                               (map #(vector (:id %) %))
+                               (into {}))]
+             (assoc todo :tasks task-idx)))
+         todos)))
