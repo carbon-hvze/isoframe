@@ -22,7 +22,7 @@
  [#_check-spec-interceptor]
  (fn [cofx ev]
    {:db {:todos {}
-         :showing :all}
+         :showing "all"}
     :xhr {:method :get
           :uri "/api/todo"
           :handler #(rf/dispatch [:save-todos %])}}))
@@ -44,7 +44,7 @@
  (fn [db [_ task]]
    {:xhr {:method :post
           :uri "/api/task"
-          :body task
+          :params task
           :handler #(rf/dispatch [:save-task %])}}))
 
 (rf/reg-event-fx
@@ -52,7 +52,7 @@
  (fn [db [_ task]]
    {:xhr {:method :put
           :uri (str "/api/task/" (:id task))
-          :body task
+          :params task
           :handler #(rf/dispatch [:save-task %])}}))
 
 (rf/reg-event-db
@@ -61,18 +61,31 @@
   (fn [db [_ new-filter-kw]]
     (assoc db :showing new-filter-kw)))
 
-;; (rf/reg-event-db
-;;   :toggle-done
-;;   todo-interceptors
-;;   (fn [todos [id]]
-;;     (update-in todos [id :done] not)))
+(rf/reg-event-fx
+  :toggle-status
+  (fn [db [_ task]]
+    (let [new-task (update task :status #(if (= % "done") "active" "done"))]
+      {:dispatch [:update-task new-task]})))
 
-;; (rf/reg-event-db
-;;   :save
-;;   todo-interceptors
-;;   (fn [todos [id title]]
-;;     (assoc-in todos [id :title] title)))
+(rf/reg-event-db
+ :delete-task-db
+ (fn [db [_ todo-id task-id]]
+   (update-in db [:todos todo-id :tasks] dissoc task-id)))
 
+(rf/reg-event-fx
+ :delete-task
+ (fn [_ [_ todo-id task-id]]
+   {:xhr {:method :delete
+          :uri (str "/api/task/" task-id)
+          :handler #(rf/dispatch [:delete-task-db todo-id task-id])}}))
+
+(rf/reg-event-fx
+ :save-value
+ (fn [_ [_ task-id value]]
+   {:xhr {:method :patch
+          :uri (str "/api/task/" task-id)
+          :params {:value value}
+          :handler #(rf/dispatch [:save-task %])}}))
 
 ;; (rf/reg-event-db
 ;;   :clear-completed

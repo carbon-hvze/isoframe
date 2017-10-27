@@ -4,4 +4,9 @@
 
 (def sys (core/start {:db-name :isoframe :port 3000}))
 
-(db/create (:db sys) :todo {:name "My todo list"})
+(def db (:db sys))
+
+(when (empty? (db/all db :todo))
+  (db/create (:db sys) :todo {:name "My todo list"}))
+
+

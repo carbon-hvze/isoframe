@@ -61,42 +61,40 @@
                                       27 (stop)
                                       nil)})])))
 
-(defn task-input []
+(defn task-input [todo-id]
   [:header#header
    [:h1 "todos"]
    [todo-input
     {:id "new-todo"
      :placeholder "What needs to be done?"
-     :on-save #(rf/dispatch [:add-todo %])}]])
+     :on-save #(rf/dispatch [:add-task {:todo-id todo-id :value % :status "active"}])}]])
 
-(defn task-item
-  []
-  [:div "hui"]
-  #_(let [editing (reagent/atom false)]
-    (fn [{:keys [id done title]}]
-      [:li {:class (str (when done "completed ")
-                        (when @editing "editing"))}
-       [:div.view
-        [:input.toggle
-         {:type "checkbox"
-          :checked done
-          :on-change #(rf/dispatch [:toggle-done id])}]
-        [:label
-         {:on-double-click #(reset! editing true)}
-         title]
-        [:button.destroy
-         {:on-click #(rf/dispatch [:delete-todo id])}]]
-       (when @editing
-         [todo-input
-          {:class "edit"
-           :title title
-           :on-save #(rf/dispatch [:save id %])
-           :on-stop #(reset! editing false)}])])))
+(defn task-item []
+  (let [editing (reagent/atom false)]
+    (fn [{:keys [id status value] :as task}]
+      (let [done? (= status "done")]
+        [:li {:class (str (when done? "completed")
+                          (when @editing "editing"))}
+         [:div.view
+          [:input.toggle
+           {:type "checkbox"
+            :checked done?
+            :on-change #(rf/dispatch [:toggle-status task])}]
+          [:label
+           {:on-double-click #(reset! editing true)}
+           value]
+          [:button.destroy
+           {:on-click #(rf/dispatch [:delete-task (:todo-id task) id])}]]
+         (when @editing
+           [todo-input
+            {:class "edit"
+             :title value
+             :on-save #(rf/dispatch [:save-value id %])
+             :on-stop #(reset! editing false)}])]))))
 
 (defn task-list [todo-id]
-  (let [visible-tasks @(rf/subscribe [:visible-tasks todo-id])
-        ;; all-complete? @(rf/subscribe [:all-complete? todo-id])
-        ]
+  (let [visible-tasks @(rf/subscribe [:visible-tasks todo-id])]
+        ;; all-complete? @(rf/subscribe [:all-complete? todo-id])]
     [:section#main
      #_[:input#toggle-all
       {:type "checkbox"
@@ -112,10 +110,10 @@
 (defn todo-app
   []
   [:div
-   [:section#todoapp
-    (when-let [todo (first @(rf/subscribe [:todos]))]
-      [task-input]
-      [task-list (:id todo)])
-    #_[footer-controls]]
+   (when-let [todo (first @(rf/subscribe [:todos]))]
+     [:section#todoapp
+      [task-input (:id todo)]
+      [task-list (:id todo)]
+      #_[footer-controls]])
    #_[:footer#info
     [:p "Double-click to edit a todo"]]])

@@ -26,7 +26,6 @@
                  [cljs-ajax "0.7.2" :exclusions [com.cognitect/transit-clj]]
                  [reagent "0.7.0"]
                  [re-frame "0.10.1"]
-                 [secretary "1.2.3"]
                  [com.cognitect/transit-cljs          "0.8.239"]]
 
   :plugins [[lein-figwheel  "0.5.14" :exclusions [org.clojure/clojure]]
@@ -48,8 +47,7 @@
   :main isoframe.core
   :repl-options {:init-ns isoframe.server}
 
-  :profiles {:web {:dependencies [[figwheel-sidecar "0.5.14"]
-                                  [reagent "0.7.0"]]
+  :profiles {:web {:dependencies [[reagent "0.7.0"]]
                    :cljsbuild {:builds {:web {:source-paths ["src/web" "env/web" "src/cljc"]
                                               :figwheel true
                                               :compiler     {:asset-path           "js"

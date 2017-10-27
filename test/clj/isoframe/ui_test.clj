@@ -12,10 +12,14 @@
 
 (rf/reg-fx
  :xhr
- (fn [{:keys [method uri body handler]}]
+ (fn [{:keys [method uri params handler]}]
    (let [uri (rest (str/split uri #"\/"))
-         res (u/http (into [method] uri) {:body body})]
+         res (u/http (into [method] uri) {:body params})]
      (handler (:body res)))))
+
+(defn dispatch [ev]
+  (rf/dispatch ev)
+  (Thread/sleep 100))
 
 (deftest test-ui-logic
   (u/start-system)
@@ -27,11 +31,9 @@
    {:status 201
     :body not-empty})
 
-  (rf/dispatch [:initialise-db])
+  (dispatch [:initialise-db])
 
-  (Thread/sleep 500)
-
-  (is (= @(rf/subscribe [:showing]) :all))
+  (is (= @(rf/subscribe [:showing]) "all"))
 
   (def todo-id (get-in new-todo [:body :id]))
 
@@ -39,9 +41,7 @@
    @(rf/subscribe [:todos])
    [{:name "My todo"}])
 
-  (rf/dispatch [:add-task {:todo-id todo-id :value "Prepare 4 ITGM" :status "active"}])
-
-  (Thread/sleep 500)
+  (dispatch [:add-task {:todo-id todo-id :value "Prepare 4 ITGM" :status "active"}])
 
   (def task (->> (u/http [:get "api" "task" {:todo-id todo-id}]) :body first))
 
@@ -51,9 +51,30 @@
    @(rf/subscribe [:tasks todo-id])
    [task])
 
-  (rf/dispatch [:update-task (assoc task :status "done")])
+  (dispatch [:save-value task-id "new value"])
 
-  (Thread/sleep 500)
+  (matcho/match
+   @(rf/subscribe [:tasks todo-id])
+   [{:value "new value"}])
+
+  (matcho/match
+   (u/http [:get "api" "task" task-id])
+   {:status 200
+    :body {:value "new value"}})
+
+  (dispatch [:toggle-status task])
+
+  (def task (first @(rf/subscribe [:tasks todo-id])))
+
+  (matcho/match task {:status "done"})
+
+  (dispatch [:toggle-status task])
+
+  (matcho/match
+   @(rf/subscribe [:tasks todo-id])
+   [{:status "active"}])
+
+  (dispatch [:update-task (assoc task :status "done")])
 
   (matcho/match
    (u/http [:get "api" "task" task-id])
@@ -64,9 +85,7 @@
    @(rf/subscribe [:tasks todo-id])
    [{:status "done"}])
 
-  (rf/dispatch [:set-showing "done"])
-
-  (Thread/sleep 500)
+  (dispatch [:set-showing "done"])
 
   (is (= @(rf/subscribe [:showing]) "done"))
 
@@ -74,18 +93,23 @@
    @(rf/subscribe [:visible-tasks todo-id])
    [{:id task-id}])
 
-  (rf/dispatch [:set-showing "active"])
-
-  (Thread/sleep 500)
+  (dispatch [:set-showing "active"])
 
   (is (empty? @(rf/subscribe [:visible-tasks todo-id])))
 
-  (rf/dispatch [:set-showing "all"])
-
-  (Thread/sleep 500)
+  (dispatch [:set-showing "all"])
 
   (matcho/match
    @(rf/subscribe [:visible-tasks todo-id])
    [{:id task-id}])
+
+  (dispatch [:delete-task todo-id task-id])
+
+  (is (empty? @(rf/subscribe [:tasks task-id])))
+
+  (matcho/match
+   (u/http [:get "api" "task" {:todo-id todo-id}])
+   {:status 200
+    :body empty?})
 
   )

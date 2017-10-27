@@ -1,6 +1,5 @@
 (ns isoframe.xhr
   (:require [ajax.core :as ajax]
-            [isoframe.cookies :as cookies]
             [re-frame.core :as rf]))
 
 (def xhr-mapper
@@ -12,7 +11,7 @@
 
 (rf/reg-fx
  :xhr
- (fn [{:keys [method uri body handler] :as opts}]
+ (fn [{:keys [method] :as opts}]
    (try
      (let [req-fn (xhr-mapper method)]
        (req-fn (str "http://localhost:3000" (:uri opts))
