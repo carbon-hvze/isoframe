@@ -23,7 +23,6 @@
                  [binaryage/devtools "0.9.4"]
                  [re-frisk "0.5.0"]
 
-                 [reagent "0.7.0"]
                  [re-frame "0.10.1"]
                  [secretary "1.2.3"]
                  [com.cognitect/transit-cljs          "0.8.239"]]
@@ -34,15 +33,7 @@
 
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
-  :clean-targets ^{:protect false} ["resources/public/js" "target" "main.js"]
-
-  ;; :aliases {"figwheel"        ["run" "-m" "user" "--figwheel"]
-  ;;                                       ; TODO: Remove custom extern inference as it's unreliable
-  ;;                                       ;"externs"         ["do" "clean"
-  ;;                                       ;                   ["run" "-m" "externs"]]
-  ;;           "rebuild-modules" ["run" "-m" "user" "--rebuild-modules"]
-  ;;           "prod-build"      ^{:doc "Recompile code with prod profile."}
-  ;;            ["with-profile" "prod" "cljsbuild" "once" "main"]}
+  :clean-targets ^{:protect false} ["resources/public/js" "target" "index.ios.js" "index.android.js" #_($PLATFORM_CLEAN$)]
 
   :figwheel {:http-server-root "public"
              :server-port 3450
@@ -55,8 +46,8 @@
   :main isoframe.core
   :repl-options {:init-ns isoframe.server}
 
-  :profiles {:web {:dependencies [[figwheel-sidecar "0.5.14"]]
-
+  :profiles {:web {:dependencies [[figwheel-sidecar "0.5.14"]
+                                  [reagent "0.7.0"]]
                    :cljsbuild {:builds {:web {:source-paths ["src/web" "env/web" "src/cljc"]
                                               :figwheel true
                                               :compiler     {:asset-path           "js"
@@ -65,15 +56,27 @@
                                                              :source-map-timestamp true
                                                              :main                 "isoframe.web-ui"
                                                              :output-dir "resources/public/js"
-                                                             :output-to  "resources/public/js/client.js"}}}}}}
-
-  ;; :cljsbuild {:builds [{:id "mobile"
-  ;;                       :source-paths ["src/mobile" "env/mobile" "src/cljc"]
-  ;;                       :figwheel     true
-  ;;                       :compiler     {:output-to     "target/not-used.js"
-  ;;                                      :main          "env.mobile.main"
-  ;;                                      :output-dir    "target"
-  ;;                                       :optimizations :none}}]}
-
+                                                             :output-to  "resources/public/js/client.js"}}}}}
+             :mobile {:dependencies [[figwheel-sidecar "0.5.14"]
+                                     [com.cemerick/piggieback "0.2.1"]
+                                     [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server cljsjs/create-react-class]]]
+                             :source-paths ["src/mobile" "env/mobile" "src/cljc"]
+                             :cljsbuild    {:builds [{:id           "ios"
+                                                      :source-paths ["src/cljc" "src/cljsjs" "src/mobile" "src/reagent" "env/mobile"]
+                                                      :figwheel     true
+                                                      :compiler     {:output-to     "target/ios/not-used.js"
+                                                                     :main          "env.ios.main"
+                                                                     :output-dir    "target/ios"
+                                                                     :optimizations :none}}
+                                                     {:id           "android"
+                                                      :source-paths ["src/cljc" "src/cljsjs" "src/mobile" "src/reagent" "env/mobile"]
+                                                      :figwheel     true
+                                                      :compiler     {:output-to     "target/android/not-used.js"
+                                                                     :main          "env.android.main"
+                                                                     :output-dir    "target/android"
+                                                                     :optimizations :none}}
+#_($DEV_PROFILES$)]}
+                             :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
+             }
 
   )

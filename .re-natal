@@ -1,0 +1,22 @@
+{
+  "name": "TestApp",
+  "interface": "reagent6",
+  "envRoots": {
+    "dev": "env/mobile"
+  },
+  "modules": [],
+  "imageDirs": [
+    "images"
+  ],
+  "platforms": {
+    "ios": {
+      "host": "localhost",
+      "modules": []
+    },
+    "android": {
+      "host": "localhost",
+      "modules": []
+    }
+  },
+  "autoRequire": false
+}
