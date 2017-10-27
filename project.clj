@@ -35,7 +35,7 @@
 
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
-  :clean-targets ^{:protect false} ["resources/public/js" "target" "index.ios.js" "index.android.js" #_($PLATFORM_CLEAN$)]
+  :clean-targets ^{:protect false} ["resources/public/js" "target" #_($PLATFORM_CLEAN$)]
 
   :figwheel {:http-server-root "public"
              :server-port 3450

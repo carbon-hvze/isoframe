@@ -37,7 +37,7 @@
 
   (matcho/match
    @(rf/subscribe [:todos])
-   {todo-id {:name "My todo"}})
+   [{:name "My todo"}])
 
   (rf/dispatch [:add-task {:todo-id todo-id :value "Prepare 4 ITGM" :status "active"}])
 
@@ -49,7 +49,7 @@
 
   (matcho/match
    @(rf/subscribe [:tasks todo-id])
-   {task-id task})
+   [task])
 
   (rf/dispatch [:update-task (assoc task :status "done")])
 
@@ -62,6 +62,30 @@
 
   (matcho/match
    @(rf/subscribe [:tasks todo-id])
-   {task-id {:status "done"}})
+   [{:status "done"}])
+
+  (rf/dispatch [:set-showing "done"])
+
+  (Thread/sleep 500)
+
+  (is (= @(rf/subscribe [:showing]) "done"))
+
+  (matcho/match
+   @(rf/subscribe [:visible-tasks todo-id])
+   [{:id task-id}])
+
+  (rf/dispatch [:set-showing "active"])
+
+  (Thread/sleep 500)
+
+  (is (empty? @(rf/subscribe [:visible-tasks todo-id])))
+
+  (rf/dispatch [:set-showing "all"])
+
+  (Thread/sleep 500)
+
+  (matcho/match
+   @(rf/subscribe [:visible-tasks todo-id])
+   [{:id task-id}])
 
   )

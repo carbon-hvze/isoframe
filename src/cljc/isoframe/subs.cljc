@@ -9,24 +9,23 @@
 (rf/reg-sub
  :todos
  (fn [db _]
-   (:todos db)))
+   (or (vals (:todos db)) [])))
 
 (rf/reg-sub
  :tasks
  (fn [db [_ todo-id]]
-   (get-in db [:todos todo-id :tasks])))
+   (vals (get-in db [:todos todo-id :tasks]))))
 
-;; (rf/reg-sub
-;;  :visible-todos
-;;  (fn [query-v _]
-;;    [(rf/subscribe [:todos])
-;;     (rf/subscribe [:showing])])
-;;  (fn [[todos showing] _]
-;;    (let [filter-fn (case showing
-;;                      :active (complement :done)
-;;                      :done   :done
-;;                      :all    identity)]
-;;      (filter filter-fn todos))))
+(rf/reg-sub
+ :visible-tasks
+ (fn [[_ todo-id]]
+   [(rf/subscribe [:tasks todo-id])
+    (rf/subscribe [:showing])])
+ (fn [[tasks showing] _]
+   (let [filter-fn (if (= showing "all")
+                     identity
+                     #(= (:status %) showing))]
+   (filter filter-fn tasks))))
 
 ;; (rf/reg-sub
 ;;  :all-complete?

@@ -3,24 +3,19 @@
             [isoframe.cookies :as cookies]
             [re-frame.core :as rf]))
 
-(defn add-authorization [opts]
-  (let [token (cookies/get-cookie :auth)]
-    (if token
-      (assoc opts :headers {"Authorization" (str "Bearer " token)})
-      opts)))
+(def xhr-mapper
+  {:get ajax/GET
+   :post ajax/POST
+   :put ajax/PUT
+   :patch ajax/PATCH
+   :delete ajax/DELETE})
 
-(defn request [{:keys [uri method format] :as opts}]
-  (try
-    (let [nm (.. js/window -location -href)]
-      (method (str (when (str/includes? nm "localhost") "http://localhost:3000") (:uri opts))
-              (-> opts
-                  (dissoc :method)
-                  add-authorization)))
-    (catch js/Error e
-      (.log js/console "HTTP Request error" e))))
-
-(rf/reg-fx ::POST   (fn [opts] (request (merge opts {:method ajax/POST}))))
-(rf/reg-fx ::PUT    (fn [opts] (request (merge opts {:method ajax/PUT}))))
-(rf/reg-fx ::DELETE (fn [opts] (request (merge opts {:method ajax/DELETE}))))
-(rf/reg-fx ::PATCH  (fn [opts] (request (merge opts {:method ajax/PATCH}))))
-(rf/reg-fx ::GET    (fn [opts] (request (merge opts {:method ajax/GET}))))
+(rf/reg-fx
+ :xhr
+ (fn [{:keys [method uri body handler] :as opts}]
+   (try
+     (let [req-fn (xhr-mapper method)]
+       (req-fn (str "http://localhost:3000" (:uri opts))
+               (-> opts (dissoc :method))))
+     (catch js/Error e
+       (.log js/console "HTTP Request error" e)))))

@@ -1,4 +1,7 @@
 (ns isoframe.server
-  (:require [isoframe.core :as core]))
+  (:require [isoframe.core :as core]
+            [isoframe.db :as db]))
 
-(core/start {:db-name :isoframe :port 3000})
+(def sys (core/start {:db-name :isoframe :port 3000}))
+
+(db/create (:db sys) :todo {:name "My todo list"})

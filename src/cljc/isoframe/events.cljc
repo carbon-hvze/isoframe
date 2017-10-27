@@ -55,11 +55,11 @@
           :body task
           :handler #(rf/dispatch [:save-task %])}}))
 
-;; (rf/reg-event-db
-;;   :set-showing
-;;   [check-spec-interceptor]
-;;   (fn [db [_ new-filter-kw]]
-;;     (assoc db :showing new-filter-kw)))
+(rf/reg-event-db
+  :set-showing
+  #_[check-spec-interceptor]
+  (fn [db [_ new-filter-kw]]
+    (assoc db :showing new-filter-kw)))
 
 ;; (rf/reg-event-db
 ;;   :toggle-done
@@ -73,11 +73,6 @@
 ;;   (fn [todos [id title]]
 ;;     (assoc-in todos [id :title] title)))
 
-;; (rf/reg-event-db
-;;   :delete-todo
-;;   todo-interceptors
-;;   (fn [todos [id]]
-;;     (dissoc todos id)))
 
 ;; (rf/reg-event-db
 ;;   :clear-completed

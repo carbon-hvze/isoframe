@@ -4,7 +4,8 @@
             [io.pedestal.http
              [body-params :as body-params]
              [ring-middlewares :as pedestal-middlewares]
-             [route :as route]]
+             [route :as route]
+             [cors :as http-cors]]
             [io.pedestal.interceptor :as ic]
 
             [isoframe.migration :as migration]
@@ -30,7 +31,8 @@
              (assoc-in ctx [:request :component key] value))}))
 
 (defn start-server [db port]
-  (let [custom-interceptors [(insert-in-request :db db)
+  (let [custom-interceptors [(http-cors/allow-origin {:allowed-origins (constantly true) :creds true})
+                             (insert-in-request :db db)
                              (body-params/body-params)
                              (pedestal-middlewares/multipart-params)
                              http/transit-json-body]]
