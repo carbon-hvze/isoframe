@@ -1,2 +1,2 @@
-var modules={'react-native': require('react-native'), 'react': require('react'), 'create-react-class': require('create-react-class')};modules['./images/cljs.png']=require('./images/cljs.png');
+var modules={'react-native': require('react-native'), 'react': require('react'), 'create-react-class': require('create-react-class')};modules['react-native']=require('react-native');modules['react-navigation']=require('react-navigation');modules['native-base']=require('native-base');modules['./images/cljs.png']=require('./images/cljs.png');
 require('figwheel-bridge').withModules(modules).start('TestApp','ios','localhost');

@@ -10,7 +10,7 @@
                    (apply hash-map)
                    :profiles))
 
-(def cljs-builds (get-in profiles [:dev :cljsbuild :builds]))
+(def cljs-builds (get-in profiles [:mobile :cljsbuild :builds]))
 
 (defn start-figwheel
       "Start figwheel for one or more builds"

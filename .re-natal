@@ -4,7 +4,11 @@
   "envRoots": {
     "dev": "env/mobile"
   },
-  "modules": [],
+  "modules": [
+    "react-native",
+    "react-navigation",
+    "native-base"
+  ],
   "imageDirs": [
     "images"
   ],
