@@ -1,25 +1,10 @@
 (ns isoframe.events
-  (:require #_[cljs.spec.alpha :as s]
-            [re-frame.core :as rf]
+  (:require [re-frame.core :as rf]))
 
-            #_[isoframe.db :as db]))
-
-#_(defn check-and-throw
-  [a-spec db]
-  (when-not (s/valid? a-spec db)
-    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
-
-;; (def check-spec-interceptor
-;;   (rf/after (partial check-and-throw ::db/db)))
-
-(def todo-interceptors [
-                        ;;check-spec-interceptor
-                        (rf/path :todos)
-                        rf/trim-v])
+(def todo-interceptors [(rf/path :todos) rf/trim-v])
 
 (rf/reg-event-fx
  :initialise-db
- [#_check-spec-interceptor]
  (fn [cofx ev]
    {:db {:todos {}
          :showing "all"}
@@ -57,7 +42,6 @@
 
 (rf/reg-event-db
   :set-showing
-  #_[check-spec-interceptor]
   (fn [db [_ new-filter-kw]]
     (assoc db :showing new-filter-kw)))
 
@@ -86,21 +70,3 @@
           :uri (str "/api/task/" task-id)
           :params {:value value}
           :handler #(rf/dispatch [:save-task %])}}))
-
-;; (rf/reg-event-db
-;;   :clear-completed
-;;   todo-interceptors
-;;   (fn [todos _]
-;;     (->> (vals todos)
-;;          (filter :done)
-;;          (map :id)
-;;          (reduce dissoc todos))))
-
-;; (rf/reg-event-db
-;;   :complete-all-toggle
-;;   todo-interceptors
-;;   (fn [todos _]
-;;     (let [new-done (not-every? :done (vals todos))]
-;;       (reduce #(assoc-in %1 [%2 :done] new-done)
-;;               todos
-;;               (keys todos)))))

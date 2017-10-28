@@ -9,7 +9,9 @@
 (rf/reg-sub
  :todos
  (fn [db _]
-   (or (vals (:todos db)) [])))
+   (if-let [todos (not-empty (:todos db))]
+     (->> todos vals (sort-by :ts))
+     [])))
 
 (rf/reg-sub
  :tasks
@@ -26,22 +28,3 @@
                      identity
                      #(= (:status %) showing))]
    (filter filter-fn tasks))))
-
-;; (rf/reg-sub
-;;  :all-complete?
-;;  :<- [:todos]
-;;  (fn [todos _]
-;;    (every? :done todos)))
-
-;; (rf/reg-sub
-;;  :completed-count
-;;  :<- [:todos]
-;;  (fn [todos _]
-;;    (count (filter :done todos))))
-
-;; (rf/reg-sub
-;;  :footer-counts
-;;  :<- [:todos]
-;;  :<- [:completed-count]
-;;  (fn [[todos completed] _]
-;;    [(- (count todos) completed) completed]))
