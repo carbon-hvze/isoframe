@@ -1,75 +1,29 @@
-# TodoMVC done with re-frame
+# Isomophic TodoMVC done with re-frame
 
 A [re-frame](https://github.com/Day8/re-frame) implementation of [TodoMVC](http://todomvc.com/).
 
-But this is NOT your normal, lean and minimal todomvc implementation, 
-geared towards showing how easily re-frame can implement the challenge.
- 
-Instead, this todomvc example has evolved into more of a teaching tool 
-and we've thrown in more advanced re-frame features which are not 
-really required to get the job done. So lean and minimal is no longer a goal. 
-
+This todo example is based on official re-frame example. 
+The rationale is the following:
+1. To show how we can create isomorphic applications i.e. write code that can be reused across different platforms.
+2. To give new perspective on how ui testing could be performed.
+Application consists of three parts - server, web and mobile ui.
+Corresponding talk was given on IT Global Meetup in Saint Petersburg, Russia.
 
 ## Setup And Run
 
 1. Install [Leiningen](http://leiningen.org/)  (plus Java).
 
-2. Get the re-frame repo
+2. Launch server
    ```
-   git clone https://github.com/Day8/re-frame.git
-   ```
-
-3. cd to the right example directory
-   ```
-   cd re-frame/examples/todomvc
+   lein repl
    ```
 
-4. Clean build
+3. Launch web ui
    ```
-   lein do clean, figwheel
-   ```
-
-5. Run
-   You'll have to wait for step 4 to do its compile, and then:
-   ```
-   open http://localhost:3450
+   lein with-profile web figwheel
    ```
 
-
-## Compile an optimised version
-
-1. Compile
+4. Or (and) mobile ui
    ```
-   lein do clean, with-profile prod compile
+   lein with-profile mobile figwheel
    ```
-
-2. Open the following in your browser
-   ```
-   resources/public/index.html
-   ```
-
-
-## Exploring The Code
-
-From the re-frame readme:
-```
-To build a re-frame app, you:
-  - design your app's data structure (data layer)
-  - write and register subscription functions (query layer)
-  - write Reagent component functions (view layer)
-  - write and register event handler functions (control layer and/or state transition layer)
-```
-
-In `src`, there's a matching set of files (each small):
-```
-src
-├── core.cljs         <--- entry point, plus history
-├── db.cljs           <--- data related  (data layer)
-├── subs.cljs         <--- subscription handlers  (query layer)
-├── views.cljs        <--- reagent  components (view layer)
-└── events.cljs     <--- event handlers (control/update layer)
-```
-
-## Further Notes
-
-The [official reagent example](https://github.com/reagent-project/reagent/tree/master/examples/todomvc). 
